@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://wwww.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Covid Tracker</title>
+    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
+    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+    <script language="javascript" type="text/javascript">
+        $(document).ready( function () {
+            $.noConflict();
+            $('#dataTable').DataTable();
+        } );
+    </script>
+</head>
+<body>
+ <div class="container">
+     <div class="row">
+         <div class="col-lg-10 mt-5 mb-5">
+             <h3 class="h3 text-center">Covid Tracker</h3>
+                 <p th:if="${result}">
+                     Updated <span th:text="${result}"></span> records in <span th:text="${execTime}"></span> ms
+                 </p>
+             <table class="table table-striped table-bordered" style="width:100%" id="dataTable">
+                 <thead>
+                     <tr>
+                         <th>Date</th>
+                         <th>Country</th>
+                         <th>Deaths</th>
+                         <th>Confirmed</th>
+                         <th>Stringency Actual</th>
+                         <th>Stringency</th>
+                     </tr>
+                 </thead>
+                 <tbody>
+                 <tr th:each="data: ${data}">
+                     <td th:text="${data.date}"></td>
+                     <td th:text="${data.countryCode}"></td>
+                     <td th:text="${data.deaths}"></td>
+                     <td th:text="${data.confirmed}"></td>
+                     <td th:text="${data.stringencyActual}"></td>
+                     <td th:text="${data.stringency}"></td>
+                 </tr>
+                 </tbody>
+             </table>
+             <nav aria-label="Page navigation" class="paging">
+                 <ul class="pagination">
+                     <li class="page-item" th:if="${hasPrev}">
+                         <a th:href="@{/data/?page={prev}(prev=${prev})}" class="page-link">Previous</a>
+                     </li>
+                     <li class="page-item">
+                         <a th:href="@{/data/update}" class="page-link">Update</a>
+                     </li>
+                     <li class="page-item" th:if="${hasNext}">
+                         <a th:href="@{/data/?page={next}(next=${next})}" class="page-link">Next</a>
+                     </li>
+                 </ul>
+             </nav>
+         </div>
+     </div>
+ </div>
+
+ <script th:src="@{/webjars/jquery/3.0.0/jquery.min.js}"></script>
+ <script th:src="@{/webjars/popper.js/1.12.9-1/umd/popper.min.js}"></script>
+ <script th:src="@{/webjars/bootstrap/4.0.0-2/js/bootstrap.min.js}"></script>
+
+</body>
+</html>
