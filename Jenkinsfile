@@ -80,7 +80,7 @@ pipeline {
                             sh 'sed -i "s/__IMAGE__/frontend-dev/g" cicd/deployment.yaml'
                         }
                         sh 'sed -i "s/__ECR__/${ECR}/g" cicd/deployment.yaml'
-                        kubernetesDeploy(configs: "cicd/k8s.yaml", kubeconfigId: "k8s")
+                        kubernetesDeploy(configs: "cicd/deployment.yaml", kubeconfigId: "k8s")
                     }
                 }
             }
