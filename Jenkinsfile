@@ -17,6 +17,12 @@ pipeline {
                 }
             }
         }
+        stage('Deploy by tag') {
+            when { buildingTag() }
+            steps {
+                echo "Deploy by tag!"
+            }
+        }
 //        stage('Sonar analyse') {
 //            steps {
 //                container('maven') {
