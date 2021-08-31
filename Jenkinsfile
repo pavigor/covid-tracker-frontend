@@ -6,6 +6,9 @@ pipeline {
             yamlFile 'cicd/agent.yaml'
         }
     }
+    environment {
+        TAG_NAME = sh(returnStdout: true, script: "git tag --contains").trim()
+    }
     stages {
         stage('Build') {
             steps {
@@ -43,13 +46,16 @@ pipeline {
             steps {
                 script {
                     container('docker') {
+                        sh 'printenv'
+                        def tag = sh(returnStdout: true, script: "git tag --contains").trim()
+                        echo "${tag}"
                         def shaSum = env.GIT_COMMIT
                         def branch = env.GIT_BRANCH
                         def shortSum = shaSum.substring(0,7)
                         if (branch.contains("/")) {
                             branch = branch.split("/")[1]
                         }
-                        def tag = "${branch}-${shortSum}"
+                        //def tag = "${branch}-${shortSum}"
 
                         def repository = ""
                         if (branch == 'main') {
@@ -57,33 +63,33 @@ pipeline {
                         } else {
                             repository = "${app_name}-dev"
                         }
-                        docker.withRegistry("https://${env.ECR}",'ecr:eu-central-1:JenkinsECR') {
-                            def image = docker.build("${repository}:${tag}")
-                            image.push()
-                            image.push('latest')
-                        }
+//                        docker.withRegistry("https://${env.ECR}",'ecr:eu-central-1:JenkinsECR') {
+//                            def image = docker.build("${repository}:${tag}")
+//                            image.push()
+//                            image.push('latest')
+//                        }
                     }
                 }
             }
 
         }
-        stage('Deploy') {
-            steps {
-                script {
-                    container('jnlp') {
-                        def branch = env.GIT_BRANCH
-                        if (branch.contains("main")) {
-                            sh 'sed -i "s/__NAMESPACE__/app-prod/g" cicd/deployment.yaml'
-                            sh 'sed -i "s/__IMAGE__/frontend/g" cicd/deployment.yaml'
-                        } else {
-                            sh 'sed -i "s/__NAMESPACE__/app-dev/g" cicd/deployment.yaml'
-                            sh 'sed -i "s/__IMAGE__/frontend-dev/g" cicd/deployment.yaml'
-                        }
-                        sh 'sed -i "s/__ECR__/${ECR}/g" cicd/deployment.yaml'
-                        kubernetesDeploy(configs: "cicd/deployment.yaml", kubeconfigId: "k8s")
-                    }
-                }
-            }
-        }
+//        stage('Deploy') {
+//            steps {
+//                script {
+//                    container('jnlp') {
+//                        def branch = env.GIT_BRANCH
+//                        if (branch.contains("main")) {
+//                            sh 'sed -i "s/__NAMESPACE__/app-prod/g" cicd/deployment.yaml'
+//                            sh 'sed -i "s/__IMAGE__/frontend/g" cicd/deployment.yaml'
+//                        } else {
+//                            sh 'sed -i "s/__NAMESPACE__/app-dev/g" cicd/deployment.yaml'
+//                            sh 'sed -i "s/__IMAGE__/frontend-dev/g" cicd/deployment.yaml'
+//                        }
+//                        sh 'sed -i "s/__ECR__/${ECR}/g" cicd/deployment.yaml'
+//                        kubernetesDeploy(configs: "cicd/deployment.yaml", kubeconfigId: "k8s")
+//                    }
+//                }
+//            }
+//        }
     }
 }
